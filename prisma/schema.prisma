@@ -14,18 +14,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum States {
+enum Status {
   PENDING
   IN_PROGRESS
   COMPLETED
   CANCELLED
 }
 
-model Tasks {
+model Task {
   id          Int      @id @default(autoincrement())
   title       String
   description String
-  due_date    DateTime
-  status      States   @default(PENDING)
+  dueDate     DateTime
+  status      Status   @default(PENDING)
   active      Boolean  @default(true)
 }
