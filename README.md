@@ -83,15 +83,15 @@ Estas presentan los siguientes query params totalmente opcionales:
 
 - `title` (string)
 - `description` (string)
-- `status`[] (array, valores posibles: `PENDING`, `IN_PROGRESS`, `DONE`, `CANCELLED`)
-- `dueDate` (string ISO)
+- `status`[] (array, valores posibles: `PENDING`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`)
+- `dueDate` (Date)
 - `page` (number)
 - `limit` (number)
 
 **Response**
 
 ```
-[
+"data": [
   {
     "id": 2,
     "title": "Important",
@@ -100,7 +100,12 @@ Estas presentan los siguientes query params totalmente opcionales:
     "status": "PENDING",
     "active": true
   }
-]
+],
+"meta": {
+  "lastPage": 1,
+  "total": 1,
+  "page": 1
+}
 ```
 
 ## PATCH api/tasks/:id
