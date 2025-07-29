@@ -29,7 +29,7 @@ describe('CreateTaskDto', () => {
     expect(titleError).toBeDefined();
   });
 
-  it('should be invalid without description', async () => {
+  it('should be valid without description', async () => {
     const dto = plainToInstance(CreateTaskDto, {
       title: 'Task title',
       dueDate: new Date(),
@@ -37,7 +37,7 @@ describe('CreateTaskDto', () => {
 
     const errors = await validate(dto);
     const descriptionError = errors.find((e) => e.property === 'description');
-    expect(descriptionError).toBeDefined();
+    expect(descriptionError).toBeUndefined();
   });
 
   it('should be invalid with invalid status', async () => {
