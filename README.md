@@ -31,7 +31,25 @@ npm install
 
 ### 3. Configurar las variables de entorno en base al archivo .env.template
 
-### 4. Ejecutar migraciones y generar cliente Prisma
+```
+PORT=
+DB_USERNAME=
+DB_PASSWORD=
+DB_HOST=
+LOCAL_PORT=
+DB_PORT=
+DB_NAME=
+DATABASE_URL=
+API_KEY=
+```
+
+### 4. Levantar la base de datos con Docker
+
+```
+  docker compose up -d
+```
+
+### 5. Ejecutar migraciones y generar cliente Prisma
 
 ```
   npx prisma migrate dev
