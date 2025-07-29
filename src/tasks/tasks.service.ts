@@ -94,7 +94,7 @@ export class TasksService {
     try {
       const { status } = changeStatusDto;
 
-      await this.findOne(id);
+      await this.ensureTaskExists(id);
 
       return await this.prisma.task.update({
         where: { id },
@@ -103,7 +103,7 @@ export class TasksService {
         },
       });
     } catch (error) {
-      this.logger.error(`Error updating status task`);
+      this.logger.error(`Error updating status task for ID ${id}`);
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException({
         message: 'Internal Server Error',
@@ -114,7 +114,7 @@ export class TasksService {
     }
   }
 
-  async findOne(id: number): Promise<Task> {
+  async ensureTaskExists(id: number): Promise<Task> {
     const task = await this.prisma.task.findUnique({
       where: { id },
     });

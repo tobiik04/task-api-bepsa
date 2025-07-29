@@ -64,8 +64,10 @@ describe('TasksService', () => {
 
   it('should invalid if task not exists', async () => {
     const id = 900000;
-    await expect(service.findOne(id)).rejects.toThrow(NotFoundException);
-    await expect(service.findOne(id)).rejects.toThrow(
+    await expect(service.ensureTaskExists(id)).rejects.toThrow(
+      NotFoundException,
+    );
+    await expect(service.ensureTaskExists(id)).rejects.toThrow(
       `Task with id ${id} not found`,
     );
   });
