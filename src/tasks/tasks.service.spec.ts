@@ -7,6 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { FilterTaskDto } from './dto/filters-task.dto';
 
 describe('TasksService', () => {
   let service: TasksService;
@@ -17,6 +18,7 @@ describe('TasksService', () => {
       findMany: jest.fn(),
       update: jest.fn(),
       findUnique: jest.fn(),
+      count: jest.fn(),
     },
   };
 
@@ -84,31 +86,83 @@ describe('TasksService', () => {
     );
   });
 
-  it('should return filtered tasks', async () => {
-    const filters = {
-      title: 'abc',
-      description: 'desc',
+  it('should return tasks with pagination metadata (minimal filters)', async () => {
+    const filters: FilterTaskDto = {
       status: ['PENDING'],
-      dueDate: new Date('2025-07-29'),
       page: 1,
       limit: 10,
     };
 
-    const expected = [{ id: 1, title: 'abc' }];
-    mockPrismaService.task.findMany.mockResolvedValue(expected);
+    const mockTasks = [];
+    const total = 1;
+    const lastPage = 1;
 
-    const result = await service.findWithFilters(filters as any);
-    expect(result).toEqual(expected);
-    expect(mockPrismaService.task.findMany).toHaveBeenCalledWith({
-      where: expect.objectContaining({
-        title: expect.any(Object),
-        description: expect.any(Object),
-        status: { in: ['PENDING'] },
-        dueDate: expect.any(Object),
-        active: true,
+    mockPrismaService.task.findMany.mockResolvedValue(mockTasks);
+    mockPrismaService.task.count.mockResolvedValue(total);
+
+    const result = await service.findWithFilters(filters);
+
+    expect(mockPrismaService.task.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          active: true,
+          status: { in: ['PENDING'] },
+        }),
+        skip: 0,
+        take: 10,
       }),
-      skip: 0,
-      take: 10,
+    );
+
+    expect(result).toEqual({
+      data: mockTasks,
+      meta: {
+        lastPage: lastPage,
+        total: total,
+        page: 1,
+      },
+    });
+  });
+
+  it('should return tasks with all filters applied', async () => {
+    const filters: FilterTaskDto = {
+      status: ['PENDING'],
+      title: 'test',
+      description: 'desc',
+      dueDate: new Date(),
+      page: 1,
+      limit: 10,
+    };
+
+    const mockTasks = [];
+    const total = 1;
+    const lastPage = 1;
+
+    mockPrismaService.task.findMany.mockResolvedValue(mockTasks);
+    mockPrismaService.task.count.mockResolvedValue(total);
+
+    const result = await service.findWithFilters(filters);
+
+    expect(mockPrismaService.task.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          title: expect.any(Object),
+          description: expect.any(Object),
+          dueDate: expect.any(Object),
+          status: { in: ['PENDING'] },
+          active: true,
+        }),
+        skip: 0,
+        take: 10,
+      }),
+    );
+
+    expect(result).toEqual({
+      data: mockTasks,
+      meta: {
+        lastPage: lastPage,
+        total: total,
+        page: 1,
+      },
     });
   });
 

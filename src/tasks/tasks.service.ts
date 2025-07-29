@@ -15,7 +15,7 @@ export class TasksService {
   private readonly logger = new Logger(TasksService.name);
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createTaskDto: CreateTaskDto) {
+  async create(createTaskDto: CreateTaskDto): Promise<Task> {
     try {
       return await this.prisma.task.create({
         data: createTaskDto,
@@ -33,13 +33,23 @@ export class TasksService {
 
   async findWithFilters(filters: FilterTaskDto) {
     try {
+      const { page, limit } = filters;
+      const total = await this.prisma.task.count({ where: { active: true } });
       const where = this.getFilters(filters);
+      const lastPage = Math.ceil(total / limit);
       const tasks = await this.prisma.task.findMany({
         where,
-        skip: filters.page ? (filters.page - 1) * filters.limit : 0,
-        take: filters.limit,
+        skip: (page - 1) * limit,
+        take: limit,
       });
-      return tasks;
+      return {
+        data: tasks,
+        meta: {
+          lastPage: lastPage,
+          total: total,
+          page: page,
+        },
+      };
     } catch (error) {
       this.logger.error(error, 'Error finding tasks');
       throw new InternalServerErrorException({
