@@ -6,8 +6,9 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { TaskStatus, TaskStatusList } from '../enum/task.enum';
-import { Status } from 'generated/prisma';
+import { TaskStatusList } from '../enum/task.enum';
+import { Status } from '../../../generated/prisma';
+import 'reflect-metadata';
 
 export class CreateTaskDto {
   @IsString()

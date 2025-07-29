@@ -4,16 +4,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { envs } from 'src/config/envs';
+import { envs } from '../../config/envs';
 
 export class ApiKeyGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const req = context.switchToHttp().getRequest();
-
-    const authHeader = req.headers['authorization'];
     const envApikey = envs.apiKey;
+    const req = context.switchToHttp().getRequest();
+    const authHeader = req.headers['authorization'];
+
+    if (!authHeader)
+      throw new UnauthorizedException('Authorization header is missing');
 
     const [type, token] = authHeader.split(' ');
 

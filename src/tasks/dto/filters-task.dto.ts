@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PaginationDTO } from './pagination.dto';
-import { TaskStatus, TaskStatusList } from '../enum/task.enum';
+import { TaskStatusList } from '../enum/task.enum';
 import { Status } from 'generated/prisma';
 
 export class FilterTaskDto extends PaginationDTO {
@@ -28,11 +28,6 @@ export class FilterTaskDto extends PaginationDTO {
   })
   @Type(() => String)
   status?: Status[];
-
-  @IsOptional()
-  @IsBoolean()
-  @Type(() => Boolean)
-  active?: boolean;
 
   @IsOptional()
   @IsDate()

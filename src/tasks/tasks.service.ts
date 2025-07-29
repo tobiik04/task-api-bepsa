@@ -2,17 +2,19 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { FilterTaskDto } from './dto/filters-task.dto';
-import { Prisma } from 'generated/prisma';
+import { Prisma, Task } from 'generated/prisma';
 import { StatusDTO } from './dto/status.dto';
 
 @Injectable()
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
   constructor(private readonly prisma: PrismaService) {}
+
   async create(createTaskDto: CreateTaskDto) {
     try {
       return await this.prisma.task.create({
@@ -91,6 +93,9 @@ export class TasksService {
   async updateStatus(id: number, changeStatusDto: StatusDTO) {
     try {
       const { status } = changeStatusDto;
+
+      await this.findOne(id);
+
       return await this.prisma.task.update({
         where: { id },
         data: {
@@ -98,7 +103,8 @@ export class TasksService {
         },
       });
     } catch (error) {
-      this.logger.error(error, 'Error updating status task');
+      this.logger.error(`Error updating status task`);
+      if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException({
         message: 'Internal Server Error',
         debug: {
@@ -106,5 +112,15 @@ export class TasksService {
         },
       });
     }
+  }
+
+  async findOne(id: number): Promise<Task> {
+    const task = await this.prisma.task.findUnique({
+      where: { id },
+    });
+
+    if (!task) throw new NotFoundException(`Task with id ${id} not found`);
+
+    return task;
   }
 }
