@@ -24,7 +24,7 @@ enum Status {
 model Task {
   id          Int      @id @default(autoincrement())
   title       String
-  description String
+  description String?
   dueDate     DateTime
   status      Status   @default(PENDING)
   active      Boolean  @default(true)

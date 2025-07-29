@@ -3,6 +3,7 @@ import {
   IsBoolean,
   IsDate,
   IsEnum,
+  IsNotEmpty,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -12,10 +13,12 @@ import 'reflect-metadata';
 
 export class CreateTaskDto {
   @IsString()
+  @IsNotEmpty()
   title: string;
 
   @IsString()
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @IsOptional()
   @IsEnum(TaskStatusList, {
